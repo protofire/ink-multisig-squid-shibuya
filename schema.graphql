@@ -1,0 +1,12 @@
+type MultisigFactory @entity {
+  id: ID!
+  address: String!
+}
+ 
+type Multisig @entity {
+  id: ID!
+  address: String!
+  threshold: Int!
+  owners: [String!]!
+}
+ 
