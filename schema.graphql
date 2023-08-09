@@ -8,5 +8,7 @@ type Multisig @entity {
   address: String!
   threshold: Int!
   owners: [String!]!
+  creationTimestamp: DateTime!
+  creationBlockNumber: Int!
 }
  

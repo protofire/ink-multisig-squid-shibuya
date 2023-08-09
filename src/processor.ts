@@ -33,7 +33,9 @@ processor.run(new TypeormDatabase(), async ctx => {
             id: ms.id,
             address: ms.address,
             threshold: ms.threshold,
-            owners: ms.owners
+            owners: ms.owners,
+            creationTimestamp: ms.creationTimestamp,
+            creationBlockNumber: ms.creationBlockNumber
         })
  
         return multisig
@@ -47,6 +49,8 @@ interface MultisigRecord {
     address: string
     threshold: number
     owners: string[]
+    creationTimestamp: Date
+    creationBlockNumber: number
 }
 
 function extractMultisigRecords(ctx: Ctx): MultisigRecord[] {
@@ -58,9 +62,11 @@ function extractMultisigRecords(ctx: Ctx): MultisigRecord[] {
                 if (event.__kind === 'NewMultisig') {
                     records.push({
                         id: item.event.id,
-                        address: event.multisigAddress.toString(),
+                        address: ss58.codec(SS58_PREFIX).encode(event.multisigAddress),
                         threshold: event.threshold,
-                        owners: event.ownersList.map(owner => owner.toString())
+                        owners: event.ownersList.map(owner => ss58.codec(SS58_PREFIX).encode(owner)),
+                        creationTimestamp: new Date(block.header.timestamp),
+                        creationBlockNumber: block.header.height
                     })
                 }
             }

@@ -17,4 +17,10 @@ export class Multisig {
 
     @Column_("text", {array: true, nullable: false})
     owners!: (string)[]
+
+    @Column_("timestamp with time zone", {nullable: false})
+    creationTimestamp!: Date
+
+    @Column_("int4", {nullable: false})
+    creationBlockNumber!: number
 }
