@@ -1,4 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {Transaction} from "./transaction.model"
 
 @Entity_()
 export class Multisig {
@@ -10,7 +11,13 @@ export class Multisig {
     id!: string
 
     @Column_("text", {nullable: false})
-    address!: string
+    addressSS58!: string
+
+    @Column_("text", {nullable: false})
+    addressHex!: string
+
+    @Column_("text", {nullable: false})
+    deploymentSalt!: string
 
     @Column_("int4", {nullable: false})
     threshold!: number
@@ -23,4 +30,7 @@ export class Multisig {
 
     @Column_("int4", {nullable: false})
     creationBlockNumber!: number
+
+    @OneToMany_(() => Transaction, e => e.multisig)
+    transactions!: Transaction[]
 }

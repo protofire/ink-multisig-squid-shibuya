@@ -2,7 +2,7 @@ import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
-    "hash": "0xb7b5f9057a0f8f82b3325453eace8468e7bc1ee2f8e861a51878694e4ec61426",
+    "hash": "0x0052c0c0070d444f20ce50f92eb4bd01ec20d5494acb2900c2bd4a5a43f71bec",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -38,7 +38,9 @@ export const metadata = {
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          "Constructor that stores the codehash of the MultiSig contract."
+        ],
         "label": "new",
         "payable": false,
         "returnType": {
@@ -57,25 +59,25 @@ export const metadata = {
         "displayName": [
           "AccountId"
         ],
-        "type": 9
+        "type": 8
       },
       "balance": {
         "displayName": [
           "Balance"
         ],
-        "type": 11
+        "type": 14
       },
       "blockNumber": {
         "displayName": [
           "BlockNumber"
         ],
-        "type": 13
+        "type": 16
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 14
+        "type": 17
       },
       "hash": {
         "displayName": [
@@ -88,25 +90,29 @@ export const metadata = {
         "displayName": [
           "Timestamp"
         ],
-        "type": 12
+        "type": 15
       }
     },
     "events": [
       {
         "args": [
           {
-            "docs": [],
+            "docs": [
+              " The address of the deployed MultiSig contract."
+            ],
             "indexed": true,
             "label": "multisig_address",
             "type": {
               "displayName": [
                 "AccountId"
               ],
-              "type": 9
+              "type": 8
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The threshold of the deployed MultiSig contract."
+            ],
             "indexed": false,
             "label": "threshold",
             "type": {
@@ -117,18 +123,35 @@ export const metadata = {
             }
           },
           {
-            "docs": [],
+            "docs": [
+              " The list of owners of the deployed MultiSig contract."
+            ],
             "indexed": false,
             "label": "owners_list",
             "type": {
               "displayName": [
                 "Vec"
               ],
-              "type": 8
+              "type": 7
+            }
+          },
+          {
+            "docs": [
+              " The salt used to deploy the MultiSig contract."
+            ],
+            "indexed": false,
+            "label": "salt",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 9
             }
           }
         ],
-        "docs": [],
+        "docs": [
+          "NewMultisig event emitted when a new MultiSig contract is deployed."
+        ],
         "label": "NewMultisig"
       }
     ],
@@ -137,7 +160,7 @@ export const metadata = {
         "ink",
         "LangError"
       ],
-      "type": 7
+      "type": 6
     },
     "messages": [
       {
@@ -157,7 +180,7 @@ export const metadata = {
               "displayName": [
                 "Vec"
               ],
-              "type": 8
+              "type": 7
             }
           },
           {
@@ -166,12 +189,18 @@ export const metadata = {
               "displayName": [
                 "Vec"
               ],
-              "type": 10
+              "type": 9
             }
           }
         ],
         "default": false,
-        "docs": [],
+        "docs": [
+          " Deploy a new MultiSig contract.",
+          " The threshold and owners_list are passed as parameters.",
+          " The salt is passed as a parameter.",
+          " The multisig address is emitted as an event with the threshold and",
+          " owners_list."
+        ],
         "label": "new_multisig",
         "mutates": true,
         "payable": false,
@@ -180,7 +209,7 @@ export const metadata = {
             "ink",
             "MessageResult"
           ],
-          "type": 3
+          "type": 10
         },
         "selector": "0xf72d4700"
       }
@@ -265,7 +294,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7
+                    "type": 6
                   }
                 ],
                 "index": 1,
@@ -281,7 +310,7 @@ export const metadata = {
           },
           {
             "name": "E",
-            "type": 7
+            "type": 6
           }
         ],
         "path": [
@@ -307,7 +336,7 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 5
                   }
                 ],
                 "index": 1,
@@ -323,7 +352,7 @@ export const metadata = {
           },
           {
             "name": "E",
-            "type": 6
+            "type": 5
           }
         ],
         "path": [
@@ -346,26 +375,6 @@ export const metadata = {
           "variant": {
             "variants": [
               {
-                "index": 0,
-                "name": "InstantiationFailed"
-              }
-            ]
-          }
-        },
-        "path": [
-          "multisig_factory",
-          "multisig_factory",
-          "Error"
-        ]
-      }
-    },
-    {
-      "id": 7,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
                 "index": 1,
                 "name": "CouldNotReadInput"
               }
@@ -379,17 +388,17 @@ export const metadata = {
       }
     },
     {
-      "id": 8,
+      "id": 7,
       "type": {
         "def": {
           "sequence": {
-            "type": 9
+            "type": 8
           }
         }
       }
     },
     {
-      "id": 9,
+      "id": 8,
       "type": {
         "def": {
           "composite": {
@@ -409,7 +418,7 @@ export const metadata = {
       }
     },
     {
-      "id": 10,
+      "id": 9,
       "type": {
         "def": {
           "sequence": {
@@ -419,7 +428,183 @@ export const metadata = {
       }
     },
     {
+      "id": 10,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 6
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 11
+          },
+          {
+            "name": "E",
+            "type": 6
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
       "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 0,
+                "name": "EnvExecutionFailed"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 6,
+                    "typeName": "LangError"
+                  }
+                ],
+                "index": 1,
+                "name": "LangExecutionFailed"
+              },
+              {
+                "index": 2,
+                "name": "OwnersCantBeEmpty"
+              },
+              {
+                "index": 3,
+                "name": "ThresholdGreaterThanOwners"
+              },
+              {
+                "index": 4,
+                "name": "ThresholdCantBeZero"
+              },
+              {
+                "index": 5,
+                "name": "Unauthorized"
+              },
+              {
+                "index": 6,
+                "name": "MaxOwnersReached"
+              },
+              {
+                "index": 7,
+                "name": "OwnerAlreadyExists"
+              },
+              {
+                "index": 8,
+                "name": "NotOwner"
+              },
+              {
+                "index": 9,
+                "name": "MaxTransactionsReached"
+              },
+              {
+                "index": 10,
+                "name": "TxIdOverflow"
+              },
+              {
+                "index": 11,
+                "name": "AlreadyVoted"
+              },
+              {
+                "index": 12,
+                "name": "InvalidTxId"
+              },
+              {
+                "index": 13,
+                "name": "TransferFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "multisig",
+          "multisig",
+          "MultisigError"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 14,
       "type": {
         "def": {
           "primitive": "u128"
@@ -427,7 +612,7 @@ export const metadata = {
       }
     },
     {
-      "id": 12,
+      "id": 15,
       "type": {
         "def": {
           "primitive": "u64"
@@ -435,7 +620,7 @@ export const metadata = {
       }
     },
     {
-      "id": 13,
+      "id": 16,
       "type": {
         "def": {
           "primitive": "u32"
@@ -443,7 +628,7 @@ export const metadata = {
       }
     },
     {
-      "id": 14,
+      "id": 17,
       "type": {
         "def": {
           "variant": {}
@@ -499,13 +684,33 @@ export type Event = Event_NewMultisig
 
 export interface Event_NewMultisig {
     __kind: 'NewMultisig'
+    /**
+     *  The address of the deployed MultiSig contract.
+     */
     multisigAddress: AccountId
+    /**
+     *  The threshold of the deployed MultiSig contract.
+     */
     threshold: u8
+    /**
+     *  The list of owners of the deployed MultiSig contract.
+     */
     ownersList: Vec
+    /**
+     *  The salt used to deploy the MultiSig contract.
+     */
+    salt: Uint8Array
 }
 
 export type Message = Message_new_multisig
 
+/**
+ *  Deploy a new MultiSig contract.
+ *  The threshold and owners_list are passed as parameters.
+ *  The salt is passed as a parameter.
+ *  The multisig address is emitted as an event with the threshold and
+ *  owners_list.
+ */
 export interface Message_new_multisig {
     __kind: 'new_multisig'
     threshold: u8
@@ -515,6 +720,9 @@ export interface Message_new_multisig {
 
 export type Constructor = Constructor_new
 
+/**
+ * Constructor that stores the codehash of the MultiSig contract.
+ */
 export interface Constructor_new {
     __kind: 'new'
     codehash: Hash

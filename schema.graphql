@@ -1,14 +1,60 @@
+enum TransactionStatus {
+  PROPOSED
+  EXECUTED_SUCCESS
+  EXECUTED_FAILURE
+  CANCELLED
+}
+
 type MultisigFactory @entity {
   id: ID!
   address: String!
+  codeHash: String!
 }
- 
+
 type Multisig @entity {
   id: ID!
-  address: String!
+  addressSS58: String!
+  addressHex: String!
+  deploymentSalt: String!
   threshold: Int!
   owners: [String!]!
   creationTimestamp: DateTime!
   creationBlockNumber: Int!
+  transactions: [Transaction!]! @derivedFrom(field: "multisig")
 }
- 
+
+type Transaction @entity {
+  id: ID!
+  multisig: Multisig!
+  txId: Int!
+  contractAddress: String!
+  selector: String!
+  #methodName: String! //TODO: implement
+  args: String!
+  #argsHumanReadable: [String!]! //TODO: implement
+  value: BigInt!
+  status: TransactionStatus!
+  error: String
+  approvals: [Approval!]! @derivedFrom(field: "transaction")
+  rejections: [Rejection!]! @derivedFrom(field: "transaction")
+  approvalCount: Int!
+  rejectionCount: Int!
+  lastUpdatedTimestamp: DateTime!
+  lastUpdatedBlockNumber: Int!
+}
+
+type Approval @entity {
+  id: ID!
+  transaction: Transaction!
+  approver: String!
+  approvalTimestamp: DateTime!
+  approvalBlockNumber: Int!
+}
+
+type Rejection @entity {
+  id: ID!
+  transaction: Transaction!
+  rejector: String!
+  rejectionTimestamp: DateTime!
+  rejectionBlockNumber: Int!
+}

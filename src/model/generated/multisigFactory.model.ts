@@ -11,4 +11,7 @@ export class MultisigFactory {
 
     @Column_("text", {nullable: false})
     address!: string
+
+    @Column_("text", {nullable: false})
+    codeHash!: string
 }

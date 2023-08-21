@@ -1,2 +1,6 @@
 export * from "./multisigFactory.model"
 export * from "./multisig.model"
+export * from "./transaction.model"
+export * from "./_transactionStatus"
+export * from "./approval.model"
+export * from "./rejection.model"
