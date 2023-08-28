@@ -2,7 +2,7 @@ import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
-    "hash": "0x928c62eb71af918e760c538669a2577216a971a611aa5f78f062210e2a3a07a7",
+    "hash": "0xc93664205f298556415eae3f4e37ed7e585a03ca641b9f725ad235646c182688",
     "language": "ink! 4.2.0",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -266,6 +266,19 @@ export const metadata = {
                 "bool"
               ],
               "type": 9
+            }
+          },
+          {
+            "docs": [
+              " Address of the transaction proposer"
+            ],
+            "indexed": false,
+            "label": "proposer",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 1
             }
           }
         ],
@@ -2225,6 +2238,10 @@ export interface Event_TransactionProposed {
      *  Allow reentry flag of the call
      */
     allowReentry: bool
+    /**
+     *  Address of the transaction proposer
+     */
+    proposer: AccountId
 }
 
 export interface Event_Approve {
