@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
 name: ink-multisig-shibuya
-version: 1
-description: 'Ink! contract indexing squid  '
+version: 2
+description: 'Squid to index ink! multisig '
 build: 
 deploy:
   addons:

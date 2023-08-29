@@ -18,8 +18,8 @@ export class Transaction {
     @ManyToOne_(() => Multisig, {nullable: true})
     multisig!: Multisig
 
-    @Column_("int4", {nullable: false})
-    txId!: number
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    txId!: bigint
 
     @Column_("text", {nullable: false})
     contractAddress!: string

@@ -26,7 +26,7 @@ type Multisig @entity {
 type Transaction @entity {
   id: ID!
   multisig: Multisig!
-  txId: Int!
+  txId: BigInt!
   contractAddress: String!
   selector: String!
   #methodName: String! //TODO: implement
