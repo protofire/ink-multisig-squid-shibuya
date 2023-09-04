@@ -27,6 +27,7 @@ type Transaction @entity {
   id: ID!
   multisig: Multisig!
   txId: BigInt!
+  proposer: String!
   contractAddress: String!
   selector: String!
   #methodName: String! //TODO: implement

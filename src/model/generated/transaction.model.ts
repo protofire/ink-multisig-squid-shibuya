@@ -22,6 +22,9 @@ export class Transaction {
     txId!: bigint
 
     @Column_("text", {nullable: false})
+    proposer!: string
+
+    @Column_("text", {nullable: false})
     contractAddress!: string
 
     @Column_("text", {nullable: false})
