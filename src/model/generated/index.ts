@@ -1,5 +1,6 @@
 export * from "./multisigFactory.model"
 export * from "./multisig.model"
+export * from "./externalTransactionData.model"
 export * from "./transaction.model"
 export * from "./_transactionStatus"
 export * from "./approval.model"

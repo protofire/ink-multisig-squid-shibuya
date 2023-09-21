@@ -30,17 +30,23 @@ export class TransactionRepository {
       let multisig = assertNotNull(multisigs.get(tx.multisig));
       const transaction = new Transaction({
         id: tx.id,
+        proposalTxHash: tx.proposalTxHash,
+        executionTxHash: tx.executionTxHash,
         multisig: multisig,
         txId: tx.txId,
         proposer: tx.proposer,
         contractAddress: tx.contractAddress,
         selector: tx.selector,
+        methodName: tx.methodName,
         args: tx.args,
+        argsHumanReadable: tx.argsHumanReadable,
         value: tx.value,
         status: tx.status,
         error: tx.error,
         approvalCount: tx.approvalCount,
         rejectionCount: tx.rejectionCount,
+        creationTimestamp: tx.creationTimestamp,
+        creationBlockNumber: tx.creationBlockNumber,
         lastUpdatedTimestamp: tx.lastUpdatedTimestamp,
         lastUpdatedBlockNumber: tx.lastUpdatedBlockNumber,
       });

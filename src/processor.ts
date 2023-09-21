@@ -10,6 +10,7 @@ import { MultisigRepository } from "./repository/MultisigRepository";
 import { TransactionRepository } from "./repository/TransactionRepository";
 import { ApprovalRepository } from "./repository/ApprovalRepository";
 import { RejectionRepository } from "./repository/RejectionRepository";
+import { ExternalTransactionDataRepository } from "./repository/ExternalTransactionDataRepository";
 import {
   existingMultisigs,
   multisigData,
@@ -42,6 +43,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     ctx,
     multisigRepository
   );
+  const externalTransactionDataRepository = new ExternalTransactionDataRepository(ctx);
   const approvalRepository = new ApprovalRepository(ctx, transactionRepository);
   const rejectionRepository = new RejectionRepository(
     ctx,
@@ -50,7 +52,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
 
   // Initialize handlers
   const multisigFactoryEventHandler = new MultisigFactoryEventHandler();
-  const multisigEventHandler = new MultisigEventHandler(multisigRepository, transactionRepository);
+  const multisigEventHandler = new MultisigEventHandler(multisigRepository, transactionRepository, externalTransactionDataRepository);
 
   // Initialize existingMultisigs in order to know if the event received is related to a multisig
   if (existingMultisigs.size === 0) {
@@ -72,9 +74,10 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         }
         // Multisigs Events
         else if (existingMultisigs.has(contractAddressHex)) {
-          multisigEventHandler.handleEvent(
+          await multisigEventHandler.handleEvent(
             contractAddressHex,
             item.event.args.data,
+            item.event.extrinsic.hash,
             block.header
           );
         }
@@ -87,7 +90,5 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   await transactionRepository.updateOrCreate(Object.values(transactionData));
   await approvalRepository.create(approvals);
   await rejectionRepository.create(rejections);
-
-  // TODO: Clean the data from the memory
 });
 

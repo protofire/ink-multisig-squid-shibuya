@@ -13,17 +13,23 @@ export interface MultisigRecord {
 
 export interface TransactionRecord {
   id: string;
+  proposalTxHash: string;
+  executionTxHash: string | null | undefined;
   multisig: string;
   txId: bigint;
   proposer: string;
   contractAddress: string;
   selector: string;
+  methodName: string | null | undefined;
   args: string;
+  argsHumanReadable: Uint8Array | null | undefined;
   value: bigint;
   status: TransactionStatus;
   error: string | null | undefined;
   approvalCount: number;
   rejectionCount: number;
+  creationTimestamp: Date;
+  creationBlockNumber: number;
   lastUpdatedTimestamp: Date;
   lastUpdatedBlockNumber: number;
 }

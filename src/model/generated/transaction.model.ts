@@ -14,6 +14,12 @@ export class Transaction {
     @PrimaryColumn_()
     id!: string
 
+    @Column_("text", {nullable: false})
+    proposalTxHash!: string
+
+    @Column_("text", {nullable: true})
+    executionTxHash!: string | undefined | null
+
     @Index_()
     @ManyToOne_(() => Multisig, {nullable: true})
     multisig!: Multisig
@@ -30,8 +36,14 @@ export class Transaction {
     @Column_("text", {nullable: false})
     selector!: string
 
+    @Column_("text", {nullable: true})
+    methodName!: string | undefined | null
+
     @Column_("text", {nullable: false})
     args!: string
+
+    @Column_("bytea", {nullable: true})
+    argsHumanReadable!: Uint8Array | undefined | null
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     value!: bigint
@@ -53,6 +65,12 @@ export class Transaction {
 
     @Column_("int4", {nullable: false})
     rejectionCount!: number
+
+    @Column_("timestamp with time zone", {nullable: false})
+    creationTimestamp!: Date
+
+    @Column_("int4", {nullable: false})
+    creationBlockNumber!: number
 
     @Column_("timestamp with time zone", {nullable: false})
     lastUpdatedTimestamp!: Date
