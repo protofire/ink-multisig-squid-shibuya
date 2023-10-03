@@ -1,6 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
 import {Multisig} from "./multisig.model"
+import {ExternalTransactionData} from "./externalTransactionData.model"
 import {TransactionStatus} from "./_transactionStatus"
 import {Approval} from "./approval.model"
 import {Rejection} from "./rejection.model"
@@ -47,6 +48,10 @@ export class Transaction {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     value!: bigint
+
+    @Index_()
+    @ManyToOne_(() => ExternalTransactionData, {nullable: true})
+    externalTransactionData!: ExternalTransactionData | undefined | null
 
     @Column_("varchar", {length: 16, nullable: false})
     status!: TransactionStatus

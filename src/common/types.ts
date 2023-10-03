@@ -24,6 +24,7 @@ export interface TransactionRecord {
   args: string;
   argsHumanReadable: Uint8Array | null | undefined;
   value: bigint;
+  externalTransactionData: string | null | undefined;
   status: TransactionStatus;
   error: string | null | undefined;
   approvalCount: number;

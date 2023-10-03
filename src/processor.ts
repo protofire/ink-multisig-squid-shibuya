@@ -39,9 +39,11 @@ export type Ctx = BatchContext<Store, Item>;
 processor.run(new TypeormDatabase(), async (ctx) => {
   // Initialize repositories
   const multisigRepository = new MultisigRepository(ctx);
+  const externalTransactionDataRepository = new ExternalTransactionDataRepository(ctx);
   const transactionRepository = new TransactionRepository(
     ctx,
-    multisigRepository
+    multisigRepository,
+    externalTransactionDataRepository
   );
   const externalTransactionDataRepository = new ExternalTransactionDataRepository(ctx);
   const approvalRepository = new ApprovalRepository(ctx, transactionRepository);

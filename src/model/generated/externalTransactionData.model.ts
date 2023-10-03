@@ -10,9 +10,6 @@ export class ExternalTransactionData {
     id!: string
 
     @Column_("text", {nullable: false})
-    txHash!: string
-
-    @Column_("text", {nullable: false})
     methodName!: string
 
     @Column_("bytea", {nullable: false})

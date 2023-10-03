@@ -1,5 +1,7 @@
 import { Ctx } from "../processor";
 import { ExternalTransactionData } from "../model";
+import { In } from "typeorm";
+
 
 export class ExternalTransactionDataRepository {
   private ctx: Ctx;
@@ -12,7 +14,15 @@ export class ExternalTransactionDataRepository {
     txHash: string
   ): Promise<ExternalTransactionData | undefined> {
     return await this.ctx.store.findOneBy(ExternalTransactionData, {
-      txHash: txHash,
+      id: txHash,
+    });
+  }
+
+  async findByTxHash(
+    txHashes: string[]
+  ): Promise<ExternalTransactionData[]> {
+    return await this.ctx.store.findBy(ExternalTransactionData, {
+      id: In(txHashes),
     });
   }
 

@@ -294,6 +294,7 @@ export class MultisigEventHandler {
       transactionData[transactionId] = {
         ...dbTx,
         multisig: dbTx.multisig.addressHex,
+        externalTransactionData: dbTx.externalTransactionData?.id,
       };
       existingTransactions.add(transactionId);
     }
@@ -306,7 +307,7 @@ export class MultisigEventHandler {
     blockHeader: SubstrateBlock,
     status: TransactionStatus,
     txHash: string,
-    externalTransactionData: ExternalTransactionData | undefined
+    externalTransactionData: ExternalTransactionData | null | undefined
   ): TransactionRecord {
     return {
       id: newTransactionId,
@@ -321,6 +322,7 @@ export class MultisigEventHandler {
       args: uint8ArrayToHexString(event.input),
       argsHumanReadable: externalTransactionData?.args,
       value: event.transferredValue,
+      externalTransactionData: externalTransactionData?.id,
       status: status,
       error: "",
       approvalCount: 1,

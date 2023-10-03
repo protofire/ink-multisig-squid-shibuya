@@ -1,18 +1,21 @@
 import { Ctx } from "../processor";
 import { TransactionRecord } from "../common/types";
 import { Transaction } from "../model";
-import { toEntityMap } from "../common/helpers";
+import { toEntityMap, toEntityMapTx } from "../common/helpers";
 import { MultisigRepository } from "./MultisigRepository";
 import { assertNotNull } from "@subsquid/substrate-processor";
 import { In } from "typeorm";
+import { ExternalTransactionDataRepository } from "./ExternalTransactionDataRepository";
 
 export class TransactionRepository {
   private ctx: Ctx;
   private multisigRepository: MultisigRepository;
+  private externalTransactionDataRepository: ExternalTransactionDataRepository;
 
-  constructor(ctx: Ctx, multisigRepository: MultisigRepository) {
+  constructor(ctx: Ctx, multisigRepository: MultisigRepository, externalTransactionDataRepository: ExternalTransactionDataRepository) {
     this.ctx = ctx;
     this.multisigRepository = multisigRepository;
+    this.externalTransactionDataRepository = externalTransactionDataRepository;
   }
 
   async updateOrCreate(transactionRecords: TransactionRecord[]) {
@@ -26,8 +29,25 @@ export class TransactionRepository {
     ).then(toEntityMap);
     let txs: Transaction[] = [];
 
+    let extTxsData = new Set<string>();
+    for (let t of transactionRecords) {
+      if (t.externalTransactionData) {
+        extTxsData.add(t.externalTransactionData);
+      }
+    }
+
+    let extTxs = await this.externalTransactionDataRepository.findByTxHash(
+        [...extTxsData]
+    ).then(toEntityMapTx);
+
     txs = transactionRecords.map((tx) => {
       let multisig = assertNotNull(multisigs.get(tx.multisig));
+      let extTxId = tx.externalTransactionData;
+      let extTx;
+      if(extTxId) {
+        extTx = extTxs.get(extTxId);
+      }
+     
       const transaction = new Transaction({
         id: tx.id,
         proposalTxHash: tx.proposalTxHash,
@@ -41,6 +61,7 @@ export class TransactionRepository {
         args: tx.args,
         argsHumanReadable: tx.argsHumanReadable,
         value: tx.value,
+        externalTransactionData: extTx,
         status: tx.status,
         error: tx.error,
         approvalCount: tx.approvalCount,

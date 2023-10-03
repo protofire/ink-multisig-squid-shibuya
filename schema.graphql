@@ -24,8 +24,7 @@ type Multisig @entity {
 }
 
 type ExternalTransactionData @entity{
-  id: ID!
-  txHash: String!
+  id: ID! # Tx Hash
   methodName: String!
   args: Bytes!
   creationTimestamp: DateTime!
@@ -41,10 +40,9 @@ type Transaction @entity {
   proposer: String!
   contractAddress: String!
   selector: String!
-  methodName: String
   args: String!
-  argsHumanReadable: Bytes
   value: BigInt!
+  externalTransactionData: ExternalTransactionData
   status: TransactionStatus!
   error: String
   approvals: [Approval!]! @derivedFrom(field: "transaction")
