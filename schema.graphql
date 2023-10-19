@@ -5,6 +5,11 @@ enum TransactionStatus {
   CANCELLED
 }
 
+enum TransferType {
+  NATIVE
+  PSP22
+}
+
 type MultisigFactory @entity {
   id: ID!
   address: String!
@@ -21,6 +26,7 @@ type Multisig @entity {
   creationTimestamp: DateTime!
   creationBlockNumber: Int!
   transactions: [Transaction!]! @derivedFrom(field: "multisig")
+  transfers: [Transfer!]! @derivedFrom(field: "multisig")
 }
 
 type ExternalTransactionData @entity{
@@ -31,8 +37,15 @@ type ExternalTransactionData @entity{
   inUse: Boolean!
 }
 
-type Transaction @entity {
+interface Tx @query {
   id: ID!
+  creationTimestamp: DateTime!
+  creationBlockNumber: Int!
+  multisig: Multisig!
+}
+
+type Transaction implements Tx @entity {
+  id: ID! 
   proposalTxHash: String!
   executionTxHash: String
   multisig: Multisig!
@@ -53,6 +66,19 @@ type Transaction @entity {
   creationBlockNumber: Int!
   lastUpdatedTimestamp: DateTime!
   lastUpdatedBlockNumber: Int!
+}
+
+type Transfer implements Tx @entity {
+  id: ID! #TxHash
+  multisig: Multisig!
+  from: String!
+  to: String!
+  value: BigInt!
+  transferType: TransferType!
+  tokenAddress: String # Only for PSP
+  tokenDecimals: Int # Only for PSP
+  creationTimestamp: DateTime!
+  creationBlockNumber: Int!
 }
 
 type Approval @entity {

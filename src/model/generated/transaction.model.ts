@@ -37,14 +37,8 @@ export class Transaction {
     @Column_("text", {nullable: false})
     selector!: string
 
-    @Column_("text", {nullable: true})
-    methodName!: string | undefined | null
-
     @Column_("text", {nullable: false})
     args!: string
-
-    @Column_("bytea", {nullable: true})
-    argsHumanReadable!: Uint8Array | undefined | null
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     value!: bigint

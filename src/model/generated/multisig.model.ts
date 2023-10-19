@@ -1,5 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import {Transaction} from "./transaction.model"
+import {Transfer} from "./transfer.model"
 
 @Entity_()
 export class Multisig {
@@ -33,4 +34,7 @@ export class Multisig {
 
     @OneToMany_(() => Transaction, e => e.multisig)
     transactions!: Transaction[]
+
+    @OneToMany_(() => Transfer, e => e.multisig)
+    transfers!: Transfer[]
 }
