@@ -1,15 +1,16 @@
-import { Ctx } from "../processor";
+import { ProcessorContext } from "../processor";
 import { ApprovalOrRejectionRecord } from "../common/types";
 import { Rejection } from "../model";
 import { toEntityMapTx } from "../common/helpers";
 import { TransactionRepository } from "./TransactionRepository";
 import { assertNotNull } from "@subsquid/substrate-processor";
+import { Store } from "@subsquid/typeorm-store";
 
 export class RejectionRepository {
-  private ctx: Ctx;
+  private ctx: ProcessorContext<Store>;
   private transactionRepository: TransactionRepository;
 
-  constructor(ctx: Ctx, multisigRepository: TransactionRepository) {
+  constructor(ctx: ProcessorContext<Store>, multisigRepository: TransactionRepository) {
     this.ctx = ctx;
     this.transactionRepository = multisigRepository;
   }

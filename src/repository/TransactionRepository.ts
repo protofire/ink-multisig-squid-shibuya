@@ -1,4 +1,4 @@
-import { Ctx } from "../processor";
+import { ProcessorContext } from "../processor";
 import { TransactionRecord } from "../common/types";
 import { Transaction } from "../model";
 import { toEntityMap, toEntityMapTx } from "../common/helpers";
@@ -6,13 +6,14 @@ import { MultisigRepository } from "./MultisigRepository";
 import { assertNotNull } from "@subsquid/substrate-processor";
 import { In } from "typeorm";
 import { ExternalTransactionDataRepository } from "./ExternalTransactionDataRepository";
+import { Store } from "@subsquid/typeorm-store";
 
 export class TransactionRepository {
-  private ctx: Ctx;
+  private ctx: ProcessorContext<Store>;
   private multisigRepository: MultisigRepository;
   private externalTransactionDataRepository: ExternalTransactionDataRepository;
 
-  constructor(ctx: Ctx, multisigRepository: MultisigRepository, externalTransactionDataRepository: ExternalTransactionDataRepository) {
+  constructor(ctx: ProcessorContext<Store>, multisigRepository: MultisigRepository, externalTransactionDataRepository: ExternalTransactionDataRepository) {
     this.ctx = ctx;
     this.multisigRepository = multisigRepository;
     this.externalTransactionDataRepository = externalTransactionDataRepository;

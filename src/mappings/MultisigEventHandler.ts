@@ -6,7 +6,7 @@ import {
   rejections,
   transactionData,
 } from "../common/entityRecords";
-import { SubstrateBlock } from "@subsquid/substrate-processor";
+import { Block as BlockHeader } from "../processor";
 import * as multisig from "../abi/multisig";
 import { MultisigRepository } from "../repository/MultisigRepository";
 import { TransactionRepository } from "../repository/TransactionRepository";
@@ -40,7 +40,7 @@ export class MultisigEventHandler {
     contractAddressHex: string,
     evenData: string,
     txHash: string,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     const event = multisig.decodeEvent(evenData);
     switch (event.__kind) {
@@ -94,7 +94,7 @@ export class MultisigEventHandler {
   private async handleThresholdChanged(
     contractAddressHex: string,
     event: multisig.Event_ThresholdChanged,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     await this.fetchMultisigDataFromDBIfNeeded(contractAddressHex);
     multisigData[contractAddressHex].threshold = event.threshold;
@@ -103,7 +103,7 @@ export class MultisigEventHandler {
   private async handleOwnerAdded(
     contractAddressHex: string,
     event: multisig.Event_OwnerAdded,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     await this.fetchMultisigDataFromDBIfNeeded(contractAddressHex);
     multisigData[contractAddressHex].owners.push(
@@ -114,7 +114,7 @@ export class MultisigEventHandler {
   private async handleOwnerRemoved(
     contractAddressHex: string,
     event: multisig.Event_OwnerRemoved,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     await this.fetchMultisigDataFromDBIfNeeded(contractAddressHex);
     multisigData[contractAddressHex].owners = multisigData[
@@ -128,7 +128,7 @@ export class MultisigEventHandler {
     contractAddressHex: string,
     event: multisig.Event_TransactionProposed,
     txHash: string,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     // Fetch external transaction data from DB if it exists
     const externalTransactionData =
@@ -158,8 +158,7 @@ export class MultisigEventHandler {
     existingTransactions.add(newTransactionId);
 
     // Create approval data
-    const newApprovalId =
-      newTransactionId + "-" + uint8ArrayToHexString(event.proposer);
+    const newApprovalId = newTransactionId + "-" + event.proposer.toString();
 
     approvals.push(
       this.createApprovalOrRejectionRecord(
@@ -175,7 +174,7 @@ export class MultisigEventHandler {
     contractAddressHex: string,
     event: multisig.Event_TransactionExecuted,
     txHash: string,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     const transactionId = this.createTransactionId(
       contractAddressHex,
@@ -202,7 +201,7 @@ export class MultisigEventHandler {
     contractAddressHex: string,
     event: multisig.Event_TransactionCancelled,
     txHash: string,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     const transactionId = this.createTransactionId(
       contractAddressHex,
@@ -221,7 +220,7 @@ export class MultisigEventHandler {
   private async handleApprove(
     contractAddressHex: string,
     event: multisig.Event_Approve,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     const transactionId = this.createTransactionId(
       contractAddressHex,
@@ -231,8 +230,7 @@ export class MultisigEventHandler {
 
     transactionData[transactionId].approvalCount += 1;
 
-    const newApprovalId =
-      transactionId + "-" + uint8ArrayToHexString(event.owner);
+    const newApprovalId = transactionId + "-" + event.owner.toString();
 
     approvals.push(
       this.createApprovalOrRejectionRecord(
@@ -247,7 +245,7 @@ export class MultisigEventHandler {
   private async handleReject(
     contractAddressHex: string,
     event: multisig.Event_Reject,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     const transactionId = this.createTransactionId(
       contractAddressHex,
@@ -257,8 +255,7 @@ export class MultisigEventHandler {
 
     transactionData[transactionId].rejectionCount += 1;
 
-    const newRejectionId =
-      transactionId + "-" + uint8ArrayToHexString(event.owner);
+    const newRejectionId = transactionId + "-" + event.owner.toString();
 
     rejections.push(
       this.createApprovalOrRejectionRecord(
@@ -304,7 +301,7 @@ export class MultisigEventHandler {
     newTransactionId: string,
     contractAddressHex: string,
     event: multisig.Event_TransactionProposed,
-    blockHeader: SubstrateBlock,
+    blockHeader: BlockHeader,
     status: TransactionStatus,
     txHash: string,
     externalTransactionData: ExternalTransactionData | null | undefined
@@ -317,29 +314,29 @@ export class MultisigEventHandler {
       txId: event.txId,
       proposer: ss58.codec(SS58_PREFIX).encode(event.proposer),
       contractAddress: ss58.codec(SS58_PREFIX).encode(event.contractAddress),
-      selector: uint8ArrayToHexString(event.selector),
-      args: uint8ArrayToHexString(event.input),
+      selector: event.selector.toString(),
+      args: event.input.toString(),
       value: event.transferredValue,
       externalTransactionData: externalTransactionData?.id,
       status: status,
       error: "",
       approvalCount: 1,
       rejectionCount: 0,
-      creationTimestamp: new Date(blockHeader.timestamp),
+      creationTimestamp: new Date(blockHeader.timestamp!),
       creationBlockNumber: blockHeader.height,
-      lastUpdatedTimestamp: new Date(blockHeader.timestamp),
+      lastUpdatedTimestamp: new Date(blockHeader.timestamp!),
       lastUpdatedBlockNumber: blockHeader.height,
     };
   }
 
   private updateTransactionData(
     transactionId: string,
-    blockHeader: SubstrateBlock,
+    blockHeader: BlockHeader,
     status: TransactionStatus,
     txHash: string | null
   ) {
     transactionData[transactionId].lastUpdatedTimestamp = new Date(
-      blockHeader.timestamp
+      blockHeader.timestamp!
     );
     transactionData[transactionId].lastUpdatedBlockNumber = blockHeader.height;
     transactionData[transactionId].status = status;
@@ -366,13 +363,13 @@ export class MultisigEventHandler {
     id: string,
     transactionId: string,
     owner: Uint8Array,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ): ApprovalOrRejectionRecord {
     return {
       id: id,
       transaction: transactionId,
       caller: ss58.codec(SS58_PREFIX).encode(owner),
-      timestamp: new Date(blockHeader.timestamp),
+      timestamp: new Date(blockHeader.timestamp!),
       blockNumber: blockHeader.height,
     };
   }

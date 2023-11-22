@@ -1,15 +1,16 @@
-import { Ctx } from "../processor";
+import { ProcessorContext } from "../processor";
 import { Transfer } from "../model";
 import { MultisigRepository } from "./MultisigRepository";
 import { TransferRecord } from "../common/types";
 import { toEntityMap } from "../common/helpers";
 import { assertNotNull } from "@subsquid/substrate-processor";
+import { Store } from "@subsquid/typeorm-store";
 
 export class TransferRepository {
-  private ctx: Ctx;
+  private ctx: ProcessorContext<Store>;
     private multisigRepository: MultisigRepository;
 
-  constructor(ctx: Ctx, multisigRepository: MultisigRepository) {
+  constructor(ctx: ProcessorContext<Store>, multisigRepository: MultisigRepository) {
     this.ctx = ctx;
     this.multisigRepository = multisigRepository;
   }

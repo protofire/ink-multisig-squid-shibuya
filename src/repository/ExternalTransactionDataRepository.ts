@@ -1,12 +1,13 @@
-import { Ctx } from "../processor";
+import { ProcessorContext } from "../processor";
 import { ExternalTransactionData } from "../model";
 import { In } from "typeorm";
+import { Store } from "@subsquid/typeorm-store";
 
 
 export class ExternalTransactionDataRepository {
-  private ctx: Ctx;
+  private ctx: ProcessorContext<Store>;
 
-  constructor(ctx: Ctx) {
+  constructor(ctx: ProcessorContext<Store>) {
     this.ctx = ctx;
   }
 

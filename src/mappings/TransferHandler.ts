@@ -1,4 +1,4 @@
-import { SubstrateBlock } from "@subsquid/substrate-processor";
+import { Block as BlockHeader } from "../processor";
 import { TransferType } from "../model";
 import { TransferRecord } from "../common/types";
 import { transferRecords } from "../common/entityRecords";
@@ -13,7 +13,7 @@ export class TransferHandler {
     args: any,
     multisigAddress: string,
     txHash: string,
-    blockHeader: SubstrateBlock
+    blockHeader: BlockHeader
   ) {
     let from = hexStringToUint8Array(args.from);
     let to = hexStringToUint8Array(args.to);
@@ -25,7 +25,7 @@ export class TransferHandler {
       to: ss58.codec(SS58_PREFIX).encode(to),
       value: BigInt(args.amount),
       transferType: TransferType.NATIVE,
-      creationTimestamp: new Date(blockHeader.timestamp),
+      creationTimestamp: new Date(blockHeader.timestamp!),
       creationBlockNumber: blockHeader.height,
     } as TransferRecord;
 

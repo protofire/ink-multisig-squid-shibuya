@@ -1,12 +1,13 @@
-import { Ctx } from "../processor";
+import { ProcessorContext } from "../processor";
 import { MultisigRecord } from "../common/types";
 import { Multisig } from "../model";
 import { In } from "typeorm";
+import { Store } from "@subsquid/typeorm-store";
 
 export class MultisigRepository {
-  private ctx: Ctx;
+  private ctx: ProcessorContext<Store>;
 
-  constructor(ctx: Ctx) {
+  constructor(ctx: ProcessorContext<Store>) {
     this.ctx = ctx;
   }
 
@@ -32,7 +33,7 @@ export class MultisigRepository {
   }
 
   async findAll(): Promise<Multisig[]> {
-    return await this.ctx.store.findBy(Multisig, {});//TODO: Only return multisigs addressHex and not the whole multisig
+    return await this.ctx.store.findBy(Multisig, {});
   }
 
   async findByAddressHex(
