@@ -9,3 +9,5 @@
 /builds
 
 test.sh
+
+.env
