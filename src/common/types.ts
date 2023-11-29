@@ -34,20 +34,22 @@ export interface TransactionRecord {
 }
 
 export interface ApprovalOrRejectionRecord {
-    id: string;
-    transaction: string;
-    caller: string;
-    timestamp: Date;
-    blockNumber: number;
-  }
+  id: string;
+  transaction: string;
+  caller: string;
+  timestamp: Date;
+  blockNumber: number;
+}
 
-  export interface TransferRecord {
-    id: string;
-    multisig: string;
-    from: string,
-    to: string,
-    value: bigint,
-    transferType: TransferType.NATIVE,
-    creationTimestamp: Date,
-    creationBlockNumber: number,
-  }
+export interface TransferRecord {
+  id: string;
+  multisig: string;
+  from: string;
+  to: string;
+  value: bigint;
+  transferType: TransferType;
+  tokenAddress: string | null | undefined;
+  tokenDecimals: number | null | undefined;
+  creationTimestamp: Date;
+  creationBlockNumber: number;
+}

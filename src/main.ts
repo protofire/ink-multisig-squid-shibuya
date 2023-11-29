@@ -15,7 +15,11 @@ import {
 } from "./common/entityRecords";
 import { MultisigFactoryEventHandler } from "./mappings/MultisigFactoryEventHandler";
 import { MultisigEventHandler } from "./mappings/MultisigEventHandler";
-import { FACTORY_ADDRESS } from "./common/constants";
+import {
+  FACTORY_ADDRESS,
+  PSP22_TRANSFER_FROM_SELECTOR,
+  PSP22_TRANSFER_SELECTOR,
+} from "./common/constants";
 import { processor } from "./processor";
 import { TransferHandler } from "./mappings/TransferHandler";
 
@@ -59,6 +63,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     for (const event of block.events) {
       if (event.name === "Contracts.ContractEmitted") {
         const contractAddressHex = event.args.contract;
+
         // Factory Events
         if (contractAddressHex === FACTORY_ADDRESS) {
           multisigFactoryEventHandler.handleEvent(
@@ -84,6 +89,23 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           transferHandler.handleNativeTransfer(
             event.args,
             multisigAddress,
+            event.extrinsic!.hash,
+            block.header
+          );
+        }
+      } else if (event.name === "Contracts.Called") {
+        // TODO: Check one contract with status Failed
+        const contractAddressHex = event.args.contract;
+        const messageSelector = event.call!.args.data.slice(0, 10);
+
+        if (
+          messageSelector === PSP22_TRANSFER_SELECTOR ||
+          messageSelector === PSP22_TRANSFER_FROM_SELECTOR
+        ) {
+          transferHandler.handlePSP22Transfer(
+            contractAddressHex,
+            event.args.caller.value,
+            event.call?.args.data,
             event.extrinsic!.hash,
             block.header
           );

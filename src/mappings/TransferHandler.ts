@@ -4,7 +4,9 @@ import { TransferRecord } from "../common/types";
 import { transferRecords } from "../common/entityRecords";
 import { SS58_PREFIX } from "../common/constants";
 import * as ss58 from "@subsquid/ss58";
-import { hexStringToUint8Array} from "../common/helpers";
+import { hexStringToUint8Array } from "../common/helpers";
+import * as psp22 from "../abi/psp22";
+import { existingMultisigs } from "../common/entityRecords";
 
 export class TransferHandler {
   constructor() {}
@@ -30,5 +32,45 @@ export class TransferHandler {
     } as TransferRecord;
 
     transferRecords.push(transfer);
+  }
+
+  handlePSP22Transfer(
+    tokenAddressHex: string,
+    caller: string,
+    callData: string,
+    txHash: string,
+    blockHeader: BlockHeader
+  ) {
+    const message = psp22.decodeMessage(callData);
+    let from;
+
+    switch (message.__kind) {
+      case "PSP22_transfer":
+        from = ss58.codec(SS58_PREFIX).encode(caller);
+        break;
+      case "PSP22_transfer_from":
+        from = ss58.codec(SS58_PREFIX).encode(message.from.toString());
+        break;
+      default:
+        // This case should never happen because we already checked the selector
+        return;
+    }
+    
+    const to = ss58.codec(SS58_PREFIX).encode(message.to.toString());
+
+    if (existingMultisigs.has(to) || existingMultisigs.has(from!)) {
+      const transfer = {
+        id: txHash,
+        multisig: existingMultisigs.has(from) ? from : to,
+        from,
+        to,
+        value: BigInt(message.value),
+        transferType: TransferType.PSP22,
+        tokenAddress: ss58.codec(SS58_PREFIX).encode(tokenAddressHex),
+        creationTimestamp: new Date(blockHeader.timestamp!),
+        creationBlockNumber: blockHeader.height,
+      } as TransferRecord;
+      transferRecords.push(transfer);
+    }
   }
 }
