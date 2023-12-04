@@ -23,7 +23,6 @@ git clone https://github.com/0xLucca/ink-multisig-squid-shibuya.git && cd ink-mu
 
 ```
 DB_NAME=squid
-DB_HOST=db
 DB_PASS=postgres
 EXTERNAL_DB_PORT=23798
 EXTERNAL_GQL_PORT=4350
@@ -66,11 +65,12 @@ npm i -g @subsquid/cli
 npm ci
 ```
 
-3. Configure the environment variables. Copy the .env.example file to .env and customize the variables as needed. For local execution, the required environment variables are:
+3. Configure the environment variables. Copy the .env.local.example file to .env and customize the variables as needed. For local execution, the required environment variables are:
 ```
 DB_NAME=squid
 DB_PASS=postgres
-EXTERNAL_DB_PORT=23798
+DB_PORT=23798
+GQL_PORT=4350
 ```
 > Adjust these variables to match your local development environment.
 
