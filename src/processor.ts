@@ -36,6 +36,7 @@ export const processor = new SubstrateBatchProcessor()
     },
     extrinsic: {
       hash: true,
+      success: true,
     },
     call: {
       args: true,

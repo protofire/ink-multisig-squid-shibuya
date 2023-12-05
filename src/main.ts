@@ -99,8 +99,9 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         const messageSelector = event.call!.args.data.slice(0, 10);
 
         if (
-          messageSelector === PSP22_TRANSFER_SELECTOR ||
-          messageSelector === PSP22_TRANSFER_FROM_SELECTOR
+          event.extrinsic?.success &&
+          (messageSelector === PSP22_TRANSFER_SELECTOR ||
+            messageSelector === PSP22_TRANSFER_FROM_SELECTOR)
         ) {
           transferHandler.handlePSP22Transfer(
             contractAddressHex,
