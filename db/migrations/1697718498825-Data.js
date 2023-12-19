@@ -1,3 +1,4 @@
+require("dotenv/config");
 module.exports = class Data1697718498825 {
     name = 'Data1697718498825'
 
