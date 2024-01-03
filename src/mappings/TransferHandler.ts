@@ -55,13 +55,12 @@ export class TransferHandler {
         // This case should never happen because we already checked the selector
         return;
     }
-    
     const to = ss58.codec(SS58_PREFIX).encode(message.to.toString());
 
-    if (existingMultisigs.has(to) || existingMultisigs.has(from!)) {
+    if (existingMultisigs.has(to)) {
       const transfer = {
         id: txHash,
-        multisig: existingMultisigs.has(from) ? from : to,
+        multisig: to,
         from,
         to,
         value: BigInt(message.value),

@@ -197,12 +197,6 @@ export class MultisigEventHandler {
     then we assume that the transaction was executed successfully.
     */
     if (event.result.__kind === "Success") {
-      // console.log("calledContracts");
-      // console.log(calledContracts);
-      // console.log("contractAddressHex");
-      // console.log(
-      //   ss58.decode(transactionData[transactionId].contractAddress).bytes
-      // );
       if (
         calledContracts.includes(
           ss58.decode(transactionData[transactionId].contractAddress).bytes
