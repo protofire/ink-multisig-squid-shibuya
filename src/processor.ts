@@ -15,7 +15,7 @@ export const processor = new SubstrateBatchProcessor()
   .setDataSource({
     archive: lookupArchive("shibuya", { release: "ArrowSquid" }),
     chain: {
-      url: "wss://shibuya-rpc.dwellir.com",
+      url: "wss://shibuya.public.blastapi.io",
     },
   })
   .addContractsContractEmitted({

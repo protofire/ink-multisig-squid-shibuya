@@ -1,4 +1,4 @@
-import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
+import {Abi, Bytes, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
@@ -646,21 +646,21 @@ export const metadata = {
 
 const _abi = new Abi(metadata)
 
-export function decodeEvent(hex: string): Event {
-    return _abi.decodeEvent(hex)
+export function decodeEvent(bytes: Bytes): Event {
+    return _abi.decodeEvent(bytes)
 }
 
-export function decodeMessage(hex: string): Message {
-    return _abi.decodeMessage(hex)
+export function decodeMessage(bytes: Bytes): Message {
+    return _abi.decodeMessage(bytes)
 }
 
-export function decodeConstructor(hex: string): Constructor {
-    return _abi.decodeConstructor(hex)
+export function decodeConstructor(bytes: Bytes): Constructor {
+    return _abi.decodeConstructor(bytes)
 }
 
 export interface Chain {
-    client: {
-        call: <T=any>(method: string, params?: unknown[]) => Promise<T>
+    rpc: {
+        call<T=any>(method: string, params?: unknown[]): Promise<T>
     }
 }
 
@@ -669,16 +669,50 @@ export interface ChainContext {
 }
 
 export class Contract {
-    constructor(private ctx: ChainContext, private address: string, private blockHash?: string) { }
+    constructor(private ctx: ChainContext, private address: Bytes, private blockHash?: Bytes) { }
 
     private async stateCall<T>(selector: string, args: any[]): Promise<T> {
         let input = _abi.encodeMessageInput(selector, args)
         let data = encodeCall(this.address, input)
-        let result = await this.ctx._chain.client.call('state_call', ['ContractsApi_call', data, this.blockHash])
+        let result = await this.ctx._chain.rpc.call('state_call', ['ContractsApi_call', data, this.blockHash])
         let value = decodeResult(result)
         return _abi.decodeMessageOutput(selector, value)
     }
 }
+
+export type Constructor = Constructor_new
+
+/**
+ * Constructor that stores the codehash of the MultiSig contract.
+ */
+export interface Constructor_new {
+    __kind: 'new'
+    codehash: Hash
+}
+
+export type Hash = Bytes
+
+export type Message = Message_new_multisig
+
+/**
+ *  Deploy a new MultiSig contract.
+ *  The threshold and owners_list are passed as parameters.
+ *  The salt is passed as a parameter.
+ *  The multisig address is emitted as an event with the threshold and
+ *  owners_list.
+ */
+export interface Message_new_multisig {
+    __kind: 'new_multisig'
+    threshold: u8
+    ownersList: AccountId[]
+    salt: Vec
+}
+
+export type Vec = Bytes
+
+export type AccountId = Bytes
+
+export type u8 = number
 
 export type Event = Event_NewMultisig
 
@@ -695,45 +729,11 @@ export interface Event_NewMultisig {
     /**
      *  The list of owners of the deployed MultiSig contract.
      */
-    ownersList: Vec
+    ownersList: AccountId[]
     /**
      *  The salt used to deploy the MultiSig contract.
      */
-    salt: Uint8Array
+    salt: Vec
 }
-
-export type Message = Message_new_multisig
-
-/**
- *  Deploy a new MultiSig contract.
- *  The threshold and owners_list are passed as parameters.
- *  The salt is passed as a parameter.
- *  The multisig address is emitted as an event with the threshold and
- *  owners_list.
- */
-export interface Message_new_multisig {
-    __kind: 'new_multisig'
-    threshold: u8
-    ownersList: Vec
-    salt: Uint8Array
-}
-
-export type Constructor = Constructor_new
-
-/**
- * Constructor that stores the codehash of the MultiSig contract.
- */
-export interface Constructor_new {
-    __kind: 'new'
-    codehash: Hash
-}
-
-export type AccountId = Uint8Array
-
-export type u8 = number
-
-export type Vec = AccountId[]
-
-export type Hash = Uint8Array
 
 export type Result<T, E> = {__kind: 'Ok', value: T} | {__kind: 'Err', value: E}

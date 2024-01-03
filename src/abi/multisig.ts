@@ -1,8 +1,8 @@
-import {Abi, encodeCall, decodeResult} from "@subsquid/ink-abi"
+import {Abi, Bytes, encodeCall, decodeResult} from "@subsquid/ink-abi"
 
 export const metadata = {
   "source": {
-    "hash": "0x666d9f46a96e595c8a26ddf51dd4eada8344b1f1872566d587883b604e606c97",
+    "hash": "0x43b2fc4d17b045a3e770ac138bf2022a0a6c22bc6f4dee15d2e2784dc7958b5a",
     "language": "ink! 4.2.0",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -2034,8 +2034,8 @@ export const metadata = {
               {
                 "fields": [
                   {
-                    "type": 7,
-                    "typeName": "Vec<u8>"
+                    "type": 4,
+                    "typeName": "()"
                   }
                 ],
                 "index": 0,
@@ -2108,21 +2108,21 @@ export const metadata = {
 
 const _abi = new Abi(metadata)
 
-export function decodeEvent(hex: string): Event {
-    return _abi.decodeEvent(hex)
+export function decodeEvent(bytes: Bytes): Event {
+    return _abi.decodeEvent(bytes)
 }
 
-export function decodeMessage(hex: string): Message {
-    return _abi.decodeMessage(hex)
+export function decodeMessage(bytes: Bytes): Message {
+    return _abi.decodeMessage(bytes)
 }
 
-export function decodeConstructor(hex: string): Constructor {
-    return _abi.decodeConstructor(hex)
+export function decodeConstructor(bytes: Bytes): Constructor {
+    return _abi.decodeConstructor(bytes)
 }
 
 export interface Chain {
-    client: {
-        call: <T=any>(method: string, params?: unknown[]) => Promise<T>
+    rpc: {
+        call<T=any>(method: string, params?: unknown[]): Promise<T>
     }
 }
 
@@ -2131,9 +2131,9 @@ export interface ChainContext {
 }
 
 export class Contract {
-    constructor(private ctx: ChainContext, private address: string, private blockHash?: string) { }
+    constructor(private ctx: ChainContext, private address: Bytes, private blockHash?: Bytes) { }
 
-    get_owners(): Promise<Result<Vec, LangError>> {
+    get_owners(): Promise<Result<AccountId[], LangError>> {
         return this.stateCall('0x0b91ccc9', [])
     }
 
@@ -2157,7 +2157,7 @@ export class Contract {
         return this.stateCall('0x00702515', [index])
     }
 
-    is_tx_valid(tx_id: bigint): Promise<Result<Type_11, LangError>> {
+    is_tx_valid(tx_id: bigint): Promise<Result<Result<null, MultisigError>, LangError>> {
         return this.stateCall('0x7aec7567', [tx_id])
     }
 
@@ -2176,153 +2176,134 @@ export class Contract {
     private async stateCall<T>(selector: string, args: any[]): Promise<T> {
         let input = _abi.encodeMessageInput(selector, args)
         let data = encodeCall(this.address, input)
-        let result = await this.ctx._chain.client.call('state_call', ['ContractsApi_call', data, this.blockHash])
+        let result = await this.ctx._chain.rpc.call('state_call', ['ContractsApi_call', data, this.blockHash])
         let value = decodeResult(result)
         return _abi.decodeMessageOutput(selector, value)
     }
 }
 
-export type Event = Event_ThresholdChanged | Event_OwnerAdded | Event_OwnerRemoved | Event_TransactionProposed | Event_Approve | Event_Reject | Event_TransactionExecuted | Event_TransactionCancelled | Event_TransactionRemoved | Event_Transfer
+export type MultisigError = MultisigError_AlreadyVoted | MultisigError_EnvExecutionFailed | MultisigError_InvalidTxId | MultisigError_LangExecutionFailed | MultisigError_MaxOwnersReached | MultisigError_MaxTransactionsReached | MultisigError_NotOwner | MultisigError_OwnerAlreadyExists | MultisigError_OwnersCantBeEmpty | MultisigError_ThresholdCantBeZero | MultisigError_ThresholdGreaterThanOwners | MultisigError_TransferFailed | MultisigError_TxIdOverflow | MultisigError_Unauthorized
 
-export interface Event_ThresholdChanged {
-    __kind: 'ThresholdChanged'
-    /**
-     *  The new threshold
-     */
-    threshold: u8
+export interface MultisigError_AlreadyVoted {
+    __kind: 'AlreadyVoted'
 }
 
-export interface Event_OwnerAdded {
-    __kind: 'OwnerAdded'
-    /**
-     *  New owner's account id
-     */
-    owner: AccountId
+export interface MultisigError_EnvExecutionFailed {
+    __kind: 'EnvExecutionFailed'
+    value: string
 }
 
-export interface Event_OwnerRemoved {
-    __kind: 'OwnerRemoved'
-    /**
-     *  Removed owner's account id
-     */
-    owner: AccountId
+export interface MultisigError_InvalidTxId {
+    __kind: 'InvalidTxId'
 }
 
-export interface Event_TransactionProposed {
-    __kind: 'TransactionProposed'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-    /**
-     *  Contract address
-     */
-    contractAddress: AccountId
-    /**
-     *  Selector on the contract
-     */
-    selector: Uint8Array
-    /**
-     *  Input of the call
-     */
-    input: Uint8Array
-    /**
-     *  Transferred value of the call
-     */
+export interface MultisigError_LangExecutionFailed {
+    __kind: 'LangExecutionFailed'
+    value: LangError
+}
+
+export interface MultisigError_MaxOwnersReached {
+    __kind: 'MaxOwnersReached'
+}
+
+export interface MultisigError_MaxTransactionsReached {
+    __kind: 'MaxTransactionsReached'
+}
+
+export interface MultisigError_NotOwner {
+    __kind: 'NotOwner'
+}
+
+export interface MultisigError_OwnerAlreadyExists {
+    __kind: 'OwnerAlreadyExists'
+}
+
+export interface MultisigError_OwnersCantBeEmpty {
+    __kind: 'OwnersCantBeEmpty'
+}
+
+export interface MultisigError_ThresholdCantBeZero {
+    __kind: 'ThresholdCantBeZero'
+}
+
+export interface MultisigError_ThresholdGreaterThanOwners {
+    __kind: 'ThresholdGreaterThanOwners'
+}
+
+export interface MultisigError_TransferFailed {
+    __kind: 'TransferFailed'
+}
+
+export interface MultisigError_TxIdOverflow {
+    __kind: 'TxIdOverflow'
+}
+
+export interface MultisigError_Unauthorized {
+    __kind: 'Unauthorized'
+}
+
+export interface Transaction {
+    address: AccountId
+    selector: Bytes
+    input: Vec
     transferredValue: bigint
-    /**
-     *  Gas limit of the call
-     */
     gasLimit: u64
-    /**
-     *  Allow reentry flag of the call
-     */
     allowReentry: bool
-    /**
-     *  Address of the transaction proposer
-     */
-    proposer: AccountId
 }
 
-export interface Event_Approve {
-    __kind: 'Approve'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-    /**
-     *  approver's account id
-     */
-    owner: AccountId
+export type u64 = bigint
+
+export type Vec = Bytes
+
+export type u8 = number
+
+export type bool = boolean
+
+export type LangError = LangError_CouldNotReadInput
+
+export interface LangError_CouldNotReadInput {
+    __kind: 'CouldNotReadInput'
 }
 
-export interface Event_Reject {
-    __kind: 'Reject'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-    /**
-     *  rejecter's account id
-     */
-    owner: AccountId
-}
+export type AccountId = Bytes
 
-export interface Event_TransactionExecuted {
-    __kind: 'TransactionExecuted'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-    /**
-     *  Result of the transaction execution
-     */
-    result: TxResult
-}
-
-export interface Event_TransactionCancelled {
-    __kind: 'TransactionCancelled'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-}
-
-export interface Event_TransactionRemoved {
-    __kind: 'TransactionRemoved'
-    /**
-     *  Transaction id
-     */
-    txId: bigint
-}
-
-export interface Event_Transfer {
-    __kind: 'Transfer'
-    /**
-     *  Receiver's account id
-     */
-    to: AccountId
-    /**
-     *  Amount of the transfer
-     */
-    value: bigint
-}
-
-export type Message = Message_propose_tx | Message_approve_tx | Message_reject_tx | Message_try_execute_tx | Message_try_remove_tx | Message_add_owner | Message_remove_owner | Message_change_threshold | Message_transfer | Message_get_owners | Message_is_owner | Message_get_threshold | Message_get_next_tx_id | Message_get_active_txid_list | Message_get_tx | Message_is_tx_valid | Message_get_tx_approvals | Message_get_tx_rejections | Message_get_tx_approval_for_account
+export type Constructor = Constructor_new
 
 /**
- *  Transaction proposal
- *  The parameters of the transaction are passed as a Transaction struct
- *  The caller of this function must be an owner
- *  The maximum number of transactions cannot be passed
- *  The transaction Id cannot overflow
- *  The transaction is stored in the contract
- *  The transaction is initialized with 1 approval and 0 rejections
- *  Emit TransactionProposed event
+ * Constructor that creates a multisig contract with a list of owners and a threshold
+ * The threshold is the minimum number of approvals required to execute a transaction
+ * All the representation invariant checks are performed in the constructor
+ * The list of owners is a list of account ids that can propose, approve or reject transactions
+ * The list of owners cannot be empty
+ * The owners cannot be duplicated
+ * The threshold cannot be greater than the number of owners
+ * The threshold cannot be zero
+ * The maximum number of owners is defined by MAX_OWNERS
+ * The maximum number of transactions is defined by MAX_TRANSACTIONS
+ * The transaction Id is a counter that starts at 0 and is incremented by 1 for each transaction
+ * The transaction Id cannot overflow
  */
-export interface Message_propose_tx {
-    __kind: 'propose_tx'
-    tx: Transaction
+export interface Constructor_new {
+    __kind: 'new'
+    threshold: u8
+    ownersList: AccountId[]
+}
+
+export type Message = Message_add_owner | Message_approve_tx | Message_change_threshold | Message_get_active_txid_list | Message_get_next_tx_id | Message_get_owners | Message_get_threshold | Message_get_tx | Message_get_tx_approval_for_account | Message_get_tx_approvals | Message_get_tx_rejections | Message_is_owner | Message_is_tx_valid | Message_propose_tx | Message_reject_tx | Message_remove_owner | Message_transfer | Message_try_execute_tx | Message_try_remove_tx
+
+/**
+ *  Owner addition
+ *  The caller of this function must be the multisig contract itself
+ *  The parameter of the transaction is the owner's account id
+ *  Perform checking representation invariants
+ *  The maximum number of owners cannot be reached
+ *  The owner cannot be already an owner
+ *  The owner is added
+ *  Emit OwnerAdded event
+ */
+export interface Message_add_owner {
+    __kind: 'add_owner'
+    owner: AccountId
 }
 
 /**
@@ -2341,6 +2322,132 @@ export interface Message_approve_tx {
 }
 
 /**
+ *  Threshold change
+ *  The caller of this function must be the multisig contract itself
+ *  The parameter of the transaction is the new threshold
+ *  Perform checking representation invariants
+ *  The threshold cannot be greater than the number of owners
+ *  The threshold cannot be zero
+ *  The threshold is changed
+ *  Emit ThresholdChanged event
+ */
+export interface Message_change_threshold {
+    __kind: 'change_threshold'
+    threshold: u8
+}
+
+/**
+ *  Get Active Transactions Id List
+ *  Returns the list of active transactions
+ */
+export interface Message_get_active_txid_list {
+    __kind: 'get_active_txid_list'
+}
+
+/**
+ *  Transactions
+ *  Get Next Transaction Id
+ *  Returns the next transaction id
+ */
+export interface Message_get_next_tx_id {
+    __kind: 'get_next_tx_id'
+}
+
+/**
+ *  Owners
+ *  Get Owners
+ *  The owners list is a list of account ids that can propose, approve or reject transactions
+ */
+export interface Message_get_owners {
+    __kind: 'get_owners'
+}
+
+/**
+ *  Treshold
+ *  Get Threshold
+ *  The threshold is the current minimum number of approvals required to execute a transaction
+ */
+export interface Message_get_threshold {
+    __kind: 'get_threshold'
+}
+
+/**
+ *  Get Transaction
+ *  The parameter of the transaction is the transaction id
+ *  Returns the transaction or None if the transaction id is not valid
+ */
+export interface Message_get_tx {
+    __kind: 'get_tx'
+    index: bigint
+}
+
+/**
+ *  Get Transaction Approval For Account
+ *  The parameters of the transaction are the transaction id and the account id
+ *  Returns true if the account has approved the transaction, false if the account has rejected the transaction or None if the transaction id is not valid
+ */
+export interface Message_get_tx_approval_for_account {
+    __kind: 'get_tx_approval_for_account'
+    txId: bigint
+    owner: AccountId
+}
+
+/**
+ *  Get Transaction Approvals
+ *  The parameter of the transaction is the transaction id
+ *  Returns the number of approvals for the transaction if the transaction id is valid or None if it is not valid
+ */
+export interface Message_get_tx_approvals {
+    __kind: 'get_tx_approvals'
+    txId: bigint
+}
+
+/**
+ *  Get Transaction Rejections
+ *  The parameter of the transaction is the transaction id
+ *  Returns the number of rejections for the transaction if the transaction id is valid or None if it is not valid
+ */
+export interface Message_get_tx_rejections {
+    __kind: 'get_tx_rejections'
+    txId: bigint
+}
+
+/**
+ *  Is owner
+ *  The parameter of the transaction is the owner's account id
+ *  The owner is checked if it is an owner
+ */
+export interface Message_is_owner {
+    __kind: 'is_owner'
+    owner: AccountId
+}
+
+/**
+ *  Is Transaction Valid
+ *  The parameter of the transaction is the transaction id
+ *  Returns a result with () if the transaction id is valid or an Error if it is not valid
+ */
+export interface Message_is_tx_valid {
+    __kind: 'is_tx_valid'
+    txId: bigint
+}
+
+/**
+ *  Transaction proposal
+ *  The parameters of the transaction are passed as a Transaction struct
+ *  The caller of this function must be an owner
+ *  The maximum number of transactions cannot be passed
+ *  The transaction Id cannot overflow
+ *  The transaction is stored in the contract
+ *  The transaction is initialized with 1 approval and 0 rejections
+ *  Emit TransactionProposed event
+ */
+export interface Message_propose_tx {
+    __kind: 'propose_tx'
+    tx: Transaction
+}
+
+/**
  *  Transaction rejection
  *  The caller of this function must be an owner
  *  The parameter of the transaction is the transaction Id
@@ -2353,6 +2460,34 @@ export interface Message_approve_tx {
 export interface Message_reject_tx {
     __kind: 'reject_tx'
     txId: bigint
+}
+
+/**
+ *  Owner removal
+ *  The caller of this function must be the multisig contract itself
+ *  The parameter of the transaction is the owner's account id
+ *  Perform checking representation invariants
+ *  The owners cannot be empty after removing
+ *  The threshold cannot be greater than the number of owners after removing
+ *  The owner is removed
+ *  Emit OwnerRemoved event
+ */
+export interface Message_remove_owner {
+    __kind: 'remove_owner'
+    owner: AccountId
+}
+
+/**
+ *  Transfer funds from the contract to another account
+ *  The caller of this function must be the multisig contract itself
+ *  The parameter of the transaction is the receiver's account id and the amount to be transferred
+ *  The transfer is performed
+ *  Emit Transfer event
+ */
+export interface Message_transfer {
+    __kind: 'transfer'
+    to: AccountId
+    value: bigint
 }
 
 /**
@@ -2377,288 +2512,141 @@ export interface Message_try_remove_tx {
     txId: bigint
 }
 
-/**
- *  Owner addition
- *  The caller of this function must be the multisig contract itself
- *  The parameter of the transaction is the owner's account id
- *  Perform checking representation invariants
- *  The maximum number of owners cannot be reached
- *  The owner cannot be already an owner
- *  The owner is added
- *  Emit OwnerAdded event
- */
-export interface Message_add_owner {
-    __kind: 'add_owner'
+export type Event = Event_Approve | Event_OwnerAdded | Event_OwnerRemoved | Event_Reject | Event_ThresholdChanged | Event_TransactionCancelled | Event_TransactionExecuted | Event_TransactionProposed | Event_TransactionRemoved | Event_Transfer
+
+export interface Event_Approve {
+    __kind: 'Approve'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+    /**
+     *  approver's account id
+     */
     owner: AccountId
 }
 
-/**
- *  Owner removal
- *  The caller of this function must be the multisig contract itself
- *  The parameter of the transaction is the owner's account id
- *  Perform checking representation invariants
- *  The owners cannot be empty after removing
- *  The threshold cannot be greater than the number of owners after removing
- *  The owner is removed
- *  Emit OwnerRemoved event
- */
-export interface Message_remove_owner {
-    __kind: 'remove_owner'
+export interface Event_OwnerAdded {
+    __kind: 'OwnerAdded'
+    /**
+     *  New owner's account id
+     */
     owner: AccountId
 }
 
-/**
- *  Threshold change
- *  The caller of this function must be the multisig contract itself
- *  The parameter of the transaction is the new threshold
- *  Perform checking representation invariants
- *  The threshold cannot be greater than the number of owners
- *  The threshold cannot be zero
- *  The threshold is changed
- *  Emit ThresholdChanged event
- */
-export interface Message_change_threshold {
-    __kind: 'change_threshold'
+export interface Event_OwnerRemoved {
+    __kind: 'OwnerRemoved'
+    /**
+     *  Removed owner's account id
+     */
+    owner: AccountId
+}
+
+export interface Event_Reject {
+    __kind: 'Reject'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+    /**
+     *  rejecter's account id
+     */
+    owner: AccountId
+}
+
+export interface Event_ThresholdChanged {
+    __kind: 'ThresholdChanged'
+    /**
+     *  The new threshold
+     */
     threshold: u8
 }
 
-/**
- *  Transfer funds from the contract to another account
- *  The caller of this function must be the multisig contract itself
- *  The parameter of the transaction is the receiver's account id and the amount to be transferred
- *  The transfer is performed
- *  Emit Transfer event
- */
-export interface Message_transfer {
-    __kind: 'transfer'
+export interface Event_TransactionCancelled {
+    __kind: 'TransactionCancelled'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+}
+
+export interface Event_TransactionExecuted {
+    __kind: 'TransactionExecuted'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+    /**
+     *  Result of the transaction execution
+     */
+    result: TxResult
+}
+
+export interface Event_TransactionProposed {
+    __kind: 'TransactionProposed'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+    /**
+     *  Contract address
+     */
+    contractAddress: AccountId
+    /**
+     *  Selector on the contract
+     */
+    selector: Bytes
+    /**
+     *  Input of the call
+     */
+    input: Vec
+    /**
+     *  Transferred value of the call
+     */
+    transferredValue: bigint
+    /**
+     *  Gas limit of the call
+     */
+    gasLimit: u64
+    /**
+     *  Allow reentry flag of the call
+     */
+    allowReentry: bool
+    /**
+     *  Address of the transaction proposer
+     */
+    proposer: AccountId
+}
+
+export interface Event_TransactionRemoved {
+    __kind: 'TransactionRemoved'
+    /**
+     *  Transaction id
+     */
+    txId: bigint
+}
+
+export interface Event_Transfer {
+    __kind: 'Transfer'
+    /**
+     *  Receiver's account id
+     */
     to: AccountId
+    /**
+     *  Amount of the transfer
+     */
     value: bigint
 }
 
-/**
- *  Owners
- *  Get Owners
- *  The owners list is a list of account ids that can propose, approve or reject transactions
- */
-export interface Message_get_owners {
-    __kind: 'get_owners'
-}
-
-/**
- *  Is owner
- *  The parameter of the transaction is the owner's account id
- *  The owner is checked if it is an owner
- */
-export interface Message_is_owner {
-    __kind: 'is_owner'
-    owner: AccountId
-}
-
-/**
- *  Treshold
- *  Get Threshold
- *  The threshold is the current minimum number of approvals required to execute a transaction
- */
-export interface Message_get_threshold {
-    __kind: 'get_threshold'
-}
-
-/**
- *  Transactions
- *  Get Next Transaction Id
- *  Returns the next transaction id
- */
-export interface Message_get_next_tx_id {
-    __kind: 'get_next_tx_id'
-}
-
-/**
- *  Get Active Transactions Id List
- *  Returns the list of active transactions
- */
-export interface Message_get_active_txid_list {
-    __kind: 'get_active_txid_list'
-}
-
-/**
- *  Get Transaction
- *  The parameter of the transaction is the transaction id
- *  Returns the transaction or None if the transaction id is not valid
- */
-export interface Message_get_tx {
-    __kind: 'get_tx'
-    index: bigint
-}
-
-/**
- *  Is Transaction Valid
- *  The parameter of the transaction is the transaction id
- *  Returns a result with () if the transaction id is valid or an Error if it is not valid
- */
-export interface Message_is_tx_valid {
-    __kind: 'is_tx_valid'
-    txId: bigint
-}
-
-/**
- *  Get Transaction Approvals
- *  The parameter of the transaction is the transaction id
- *  Returns the number of approvals for the transaction if the transaction id is valid or None if it is not valid
- */
-export interface Message_get_tx_approvals {
-    __kind: 'get_tx_approvals'
-    txId: bigint
-}
-
-/**
- *  Get Transaction Rejections
- *  The parameter of the transaction is the transaction id
- *  Returns the number of rejections for the transaction if the transaction id is valid or None if it is not valid
- */
-export interface Message_get_tx_rejections {
-    __kind: 'get_tx_rejections'
-    txId: bigint
-}
-
-/**
- *  Get Transaction Approval For Account
- *  The parameters of the transaction are the transaction id and the account id
- *  Returns true if the account has approved the transaction, false if the account has rejected the transaction or None if the transaction id is not valid
- */
-export interface Message_get_tx_approval_for_account {
-    __kind: 'get_tx_approval_for_account'
-    txId: bigint
-    owner: AccountId
-}
-
-export type Constructor = Constructor_new
-
-/**
- * Constructor that creates a multisig contract with a list of owners and a threshold
- * The threshold is the minimum number of approvals required to execute a transaction
- * All the representation invariant checks are performed in the constructor
- * The list of owners is a list of account ids that can propose, approve or reject transactions
- * The list of owners cannot be empty
- * The owners cannot be duplicated
- * The threshold cannot be greater than the number of owners
- * The threshold cannot be zero
- * The maximum number of owners is defined by MAX_OWNERS
- * The maximum number of transactions is defined by MAX_TRANSACTIONS
- * The transaction Id is a counter that starts at 0 and is incremented by 1 for each transaction
- * The transaction Id cannot overflow
- */
-export interface Constructor_new {
-    __kind: 'new'
-    threshold: u8
-    ownersList: Vec
-}
-
-export type AccountId = Uint8Array
-
-export type Vec = AccountId[]
-
-export type LangError = LangError_CouldNotReadInput
-
-export interface LangError_CouldNotReadInput {
-    __kind: 'CouldNotReadInput'
-}
-
-export type bool = boolean
-
-export type u8 = number
-
-export interface Transaction {
-    address: AccountId
-    selector: Uint8Array
-    input: Uint8Array
-    transferredValue: bigint
-    gasLimit: u64
-    allowReentry: bool
-}
-
-export type Type_11 = Type_11_Ok | Type_11_Err
-
-export interface Type_11_Ok {
-    __kind: 'Ok'
-}
-
-export interface Type_11_Err {
-    __kind: 'Err'
-    value: MultisigError
-}
-
-export type u64 = bigint
-
-export type TxResult = TxResult_Success | TxResult_Failed
-
-export interface TxResult_Success {
-    __kind: 'Success'
-    value: Uint8Array
-}
+export type TxResult = TxResult_Failed | TxResult_Success
 
 export interface TxResult_Failed {
     __kind: 'Failed'
     value: MultisigError
 }
 
-export type MultisigError = MultisigError_EnvExecutionFailed | MultisigError_LangExecutionFailed | MultisigError_OwnersCantBeEmpty | MultisigError_ThresholdGreaterThanOwners | MultisigError_ThresholdCantBeZero | MultisigError_Unauthorized | MultisigError_MaxOwnersReached | MultisigError_OwnerAlreadyExists | MultisigError_NotOwner | MultisigError_MaxTransactionsReached | MultisigError_TxIdOverflow | MultisigError_AlreadyVoted | MultisigError_InvalidTxId | MultisigError_TransferFailed
-
-export interface MultisigError_EnvExecutionFailed {
-    __kind: 'EnvExecutionFailed'
-    value: string
-}
-
-export interface MultisigError_LangExecutionFailed {
-    __kind: 'LangExecutionFailed'
-    value: LangError
-}
-
-export interface MultisigError_OwnersCantBeEmpty {
-    __kind: 'OwnersCantBeEmpty'
-}
-
-export interface MultisigError_ThresholdGreaterThanOwners {
-    __kind: 'ThresholdGreaterThanOwners'
-}
-
-export interface MultisigError_ThresholdCantBeZero {
-    __kind: 'ThresholdCantBeZero'
-}
-
-export interface MultisigError_Unauthorized {
-    __kind: 'Unauthorized'
-}
-
-export interface MultisigError_MaxOwnersReached {
-    __kind: 'MaxOwnersReached'
-}
-
-export interface MultisigError_OwnerAlreadyExists {
-    __kind: 'OwnerAlreadyExists'
-}
-
-export interface MultisigError_NotOwner {
-    __kind: 'NotOwner'
-}
-
-export interface MultisigError_MaxTransactionsReached {
-    __kind: 'MaxTransactionsReached'
-}
-
-export interface MultisigError_TxIdOverflow {
-    __kind: 'TxIdOverflow'
-}
-
-export interface MultisigError_AlreadyVoted {
-    __kind: 'AlreadyVoted'
-}
-
-export interface MultisigError_InvalidTxId {
-    __kind: 'InvalidTxId'
-}
-
-export interface MultisigError_TransferFailed {
-    __kind: 'TransferFailed'
+export interface TxResult_Success {
+    __kind: 'Success'
 }
 
 export type Result<T, E> = {__kind: 'Ok', value: T} | {__kind: 'Err', value: E}
