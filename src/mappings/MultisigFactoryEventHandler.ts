@@ -24,6 +24,11 @@ export class MultisigFactoryEventHandler {
       .encode(event.multisigAddress);
     const multisigAddressHex = event.multisigAddress.toString();
 
+    // Deduplicate owners and convert to SS58 format
+    const owners = [...new Set(event.ownersList)].map((owner) =>
+      ss58.codec(SS58_PREFIX).encode(owner)
+    );
+
     // Add to record
     multisigData[multisigAddressHex] = {
       id: multisigAddressHex,
@@ -31,9 +36,7 @@ export class MultisigFactoryEventHandler {
       addressHex: multisigAddressHex,
       deploymentSalt: event.salt.toString(),
       threshold: event.threshold,
-      owners: event.ownersList.map((owner) =>
-        ss58.codec(SS58_PREFIX).encode(owner)
-      ),
+      owners: owners,
       creationTimestamp: new Date(blockHeader.timestamp!),
       creationBlockNumber: blockHeader.height,
     };
