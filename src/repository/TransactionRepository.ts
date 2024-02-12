@@ -78,8 +78,15 @@ export class TransactionRepository {
   }
 
   async findById(ids: string[]): Promise<Transaction[]> {
-    return await this.ctx.store.findBy(Transaction, {
-      id: In([...ids]),
+    let tx = await this.ctx.store.find(Transaction, {
+      relations: {
+        multisig: true,
+      },
+      where: {
+        id: In([...ids]),
+      },
     });
+
+    return tx;
   }
 }
