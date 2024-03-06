@@ -100,8 +100,9 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           transferHandler.handleNativeTransfer(
             event.args,
             to,
-            event.extrinsic!.hash,
-            block.header
+            block.header,
+            event.id,
+            event.extrinsic?.hash
           );
         }
       } else if (event.name === "Contracts.Called") {

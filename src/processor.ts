@@ -12,11 +12,10 @@ import { FACTORY_DEPLOYMENT_BLOCK } from "./common/constants";
 
 // Define the processor
 export const processor = new SubstrateBatchProcessor()
-  .setDataSource({
-    archive: lookupArchive("shibuya", { release: "ArrowSquid" }),
-    chain: {
-      url: "wss://shibuya.public.blastapi.io",
-    },
+  .setGateway(lookupArchive("shibuya", { release: "ArrowSquid" }))
+  .setRpcEndpoint({
+    url: "wss://shibuya.public.blastapi.io",
+    rateLimit: 10,
   })
   .addContractsContractEmitted({
     extrinsic: true,
