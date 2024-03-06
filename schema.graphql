@@ -29,7 +29,7 @@ type Multisig @entity {
   transfers: [Transfer!]! @derivedFrom(field: "multisig")
 }
 
-type ExternalTransactionData @entity{
+type ExternalTransactionData @entity {
   id: ID! # Tx Hash
   methodName: String!
   args: Bytes!
@@ -45,7 +45,7 @@ interface Tx @query {
 }
 
 type Transaction implements Tx @entity {
-  id: ID! 
+  id: ID!
   proposalTxHash: String!
   executionTxHash: String
   multisig: Multisig!
@@ -69,7 +69,7 @@ type Transaction implements Tx @entity {
 }
 
 type Transfer implements Tx @entity {
-  id: ID! #TxHash
+  id: ID! #EventId
   multisig: Multisig!
   from: String!
   to: String!
@@ -79,6 +79,7 @@ type Transfer implements Tx @entity {
   tokenDecimals: Int # Only for PSP
   creationTimestamp: DateTime!
   creationBlockNumber: Int!
+  txHash: String
 }
 
 type Approval @entity {

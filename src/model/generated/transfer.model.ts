@@ -39,4 +39,7 @@ export class Transfer {
 
     @Column_("int4", {nullable: false})
     creationBlockNumber!: number
+
+    @Column_("text", {nullable: true})
+    txHash!: string | undefined | null
 }

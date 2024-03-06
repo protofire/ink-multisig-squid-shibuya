@@ -52,4 +52,5 @@ export interface TransferRecord {
   tokenDecimals: number | null | undefined;
   creationTimestamp: Date;
   creationBlockNumber: number;
+  txHash: string | undefined;
 }

@@ -14,14 +14,15 @@ export class TransferHandler {
   handleNativeTransfer(
     args: any,
     multisigAddress: string,
-    txHash: string,
-    blockHeader: BlockHeader
+    blockHeader: BlockHeader,
+    eventId: string,
+    txHash?: string
   ) {
     let from = hexStringToUint8Array(args.from);
     let to = hexStringToUint8Array(args.to);
 
     const transfer = {
-      id: txHash,
+      id: eventId,
       multisig: multisigAddress,
       from: ss58.codec(SS58_PREFIX).encode(from),
       to: ss58.codec(SS58_PREFIX).encode(to),
@@ -29,6 +30,7 @@ export class TransferHandler {
       transferType: TransferType.NATIVE,
       creationTimestamp: new Date(blockHeader.timestamp!),
       creationBlockNumber: blockHeader.height,
+      txHash: txHash,
     } as TransferRecord;
 
     transferRecords.push(transfer);
