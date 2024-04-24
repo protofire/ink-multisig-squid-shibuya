@@ -12,7 +12,7 @@ import { FACTORY_DEPLOYMENT_BLOCK } from "./common/constants";
 
 // Define the processor
 export const processor = new SubstrateBatchProcessor()
-  .setGateway(lookupArchive("shibuya", { release: "ArrowSquid" }))
+  .setGateway("https://v2.archive.subsquid.io/network/shibuya-substrate")
   .setRpcEndpoint({
     url: "wss://shibuya.public.blastapi.io",
     rateLimit: 10,
